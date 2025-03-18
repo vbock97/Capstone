@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
+  background-color: #3d65ba;
   margin: 0;
   padding: 0;
 }
@@ -13,6 +13,11 @@ body {
 
 h1 {
   text-align: center;
+  color: #ffba33;
+}
+
+h2{
+  color: #ffba33;
 }
 
 .movies-list {
@@ -40,6 +45,7 @@ form {
   flex-direction: column;
   max-width: 400px;
   margin: 0 auto;
+  color: #ffba33;
 }
 
 form input {
@@ -50,13 +56,13 @@ form input {
 
 form button {
   padding: 10px;
-  background-color: #4caf50;
-  color: white;
+  background-color: #ffba33;
+  color: rgb(0, 0, 0);
   font-size: 16px;
   border: none;
   cursor: pointer;
 }
 
 form button:hover {
-  background-color: #45a049;
+  background-color: #ffa900;
 }
