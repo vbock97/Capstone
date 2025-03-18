@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Rental</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome to Movie Rental</h1>
+        <div class="movies-list">
+            <h2>Movies</h2>
+            <ul id="movie-list"></ul>
+        </div>
+
+        <div class="add-movie">
+            <h2>Add a New Movie</h2>
+            <form id="add-movie-form">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required />
+                <label for="genre">Genre:</label>
+                <input type="text" id="genre" name="genre" required />
+                <label for="director">Director:</label>
+                <input type="text" id="director" name="director" required />
+                <label for="release_year">Release Year:</label>
+                <input type="number" id="release_year" name="release_year" required />
+                <label for="rental_price">Rental Price:</label>
+                <input type="number" id="rental_price" name="rental_price" required />
+                <button type="submit">Add Movie</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

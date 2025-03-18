@@ -10,7 +10,6 @@ const client = new Client({
   port: process.env.DB_PORT,
 });
 
-
 client.connect((err) => {
   if (err) {
     console.error("Database connection error", err.stack);

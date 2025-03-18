@@ -1,5 +1,22 @@
 const db = require("./db");
 
+const createUsersTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(50) UNIQUE NOT NULL,
+      email VARCHAR(100) UNIQUE NOT NULL,
+      password VARCHAR(255) NOT NULL
+    );
+  `;
+  try {
+    await db.query(createTableQuery);
+    console.log("Users table created (or already exists)");
+  } catch (err) {
+    console.error("Error creating users table:", err);
+  }
+};
+
 const seedMovies = async () => {
   const movies = [
     {
@@ -47,4 +64,9 @@ const seedMovies = async () => {
   }
 };
 
-seedMovies();
+const seedDatabase = async () => {
+  await createUsersTable();
+  await seedMovies();
+};
+
+seedDatabase();
