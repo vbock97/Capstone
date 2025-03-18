@@ -1,10 +1,12 @@
 const express = require("express");
 const db = require("../backend/db");
+const authenticate = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/", authenticate, async (req, res) => {
   const { movie_id, return_by } = req.body;
+  const userId = req.userId;
 
   try {
     const movieResult = await db.query(
@@ -17,10 +19,10 @@ router.post("/", async (req, res) => {
         .json({ message: "Movie is not available for rent" });
     }
     const rentalQuery = `
-        INSERT INTO rentals (movie_id, return_by)
+        INSERT INTO rentals (movie_id, user_id, return_by)
         VALUES ($1, $2) RETURNING *;
         `;
-    const rentalValues = [movie_id, return_by];
+    const rentalValues = [movie_id, userId, return_by];
     const rentalResult = await db.query(rentalQuery, rentalValues);
 
     await db.query("UPDATE movies SET available = FALSE WHERE id = $1", [

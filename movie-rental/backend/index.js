@@ -3,7 +3,7 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const movieRoutes = require("./routes/movies");
 const rentalRoutes = require("./routes/rentals");
-const authRoutes = require("./routes/auth");
+const authRoutes = require("../middleware/auth");
 require("dotenv").config();
 
 const app = express();
