@@ -43,9 +43,12 @@ const login = async (req, res) => {
 
         res.json({ token });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        console.error("Error during login:", err.message);
+        console.error(err.stack);
+        res.status(500).json({ message: "Internal server error", error: err.message });
     }
 };
+
 
 const register = async (req, res) => {
     const { username, email, password } = req.body;
