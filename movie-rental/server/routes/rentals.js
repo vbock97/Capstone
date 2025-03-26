@@ -4,9 +4,11 @@ const authenticate =  require('../middleware/auth');
 
 const router = express.Router();
 
-router.post("/", authenticate , async (req, res) => {
+router.post("/rentals", async (req, res) => {
   const { movie_id, return_by } = req.body;
   const userId = req.userId;
+  const rental = req.body;
+  res.status(201).json({ message: "Rental created successfully", rental });
 
   try {
     const movieResult = await db.query(

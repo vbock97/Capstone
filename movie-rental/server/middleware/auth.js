@@ -1,60 +1,69 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const db = require("../db");
+require("dotenv").config();
 
-const router = express.Router();
+const secretKey = process.env.JWT_SECRET_KEY;
 
-const JWT_Secret = process.env.JWT_SECRET || "your_jwt_secret";
-
-router.post("/register", async (req, res) => {
-    const { username, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+const authenticate = async (req, res, next) => {
+    const token = req.headers["authorization"];
+    if (!token) return res.status(403).json({ message: "Access denied" });
 
     try {
-        const result = await db.query(
-            "INSERT INTO useres (username, email, password) VALUES ($1, $2, $3) RETURNING *"
-            [username, email, hashedPassword]
-        );
-        res.status(201).json(result.rows[0]);
+        const decoded = jwt.verify(token, secretKey);
+        req.userId = decoded.userId;
+        req.role = decoded.role;
+        next();
     } catch (err) {
-        res.status(400).json({ message: "User registration failed", error: err.message })
+        return res.status(401).json({ message: "Invalid token" });
     }
-});
+};
 
-router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+const login = async (req, res) => {
+    const { username, password } = req.body;
 
     try {
-        const user = await db.query("SELECT * FROM users WHERE email = $1", [email]);
-        if (!user.rows.length) {
+        const userQuery = "SELECT * FROM users WHERE username = $1";
+        const result = await db.query(userQuery, [username]);
+
+        if (result.rows.length === 0) {
             return res.status(400).json({ message: "User not found" });
         }
 
-        const isMatch = await bcrypt.compare(password, user.rows[0].password);
+        const user = result.rows[0];
+        const isMatch = await bcrypt.compare(password, user.password);
+
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid password" });
         }
 
-        const token = jwt.sign({ id: user.rows[0].id }, JWT_Secret, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: user.id, role: user.role }, secretKey, {
+            expiresIn: "1h",
+        });
+
         res.json({ token });
     } catch (err) {
-        res.status(500).json({ message: "Server error", error: err.message });
+        res.status(500).json({ message: err.message });
     }
-});
-
-const authenticate = (req, res, next) => {
-    const token = req.headers["authorization"];
-    if (!token) {
-        return res.status(403).json({ message: "No token provided" });
-    }
-    jwt.verify(token, JWT_Secret, (err, decoded) => {
-        if (err) {
-            return res.status(401).json({ message: "Invalid token" });
-        }
-        req.userId = decoded.id;
-        next();
-    });
 };
 
-module.exports = authenticate;
+const register = async (req, res) => {
+    const { username, email, password } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const role = "user";
+        const query = `
+        INSERT INTO users (username, email, password)
+        VALUES ($1, $2, $3) RETURNING *;
+    `;
+        const values = [username, email, hashedPassword];
+        const result = await db.query(query, values);
+
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+module.exports = { authenticate, login, register };
