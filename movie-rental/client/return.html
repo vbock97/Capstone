@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="rent.html">Rent</a></li>
+            <li><a href="return.html">Return</a></li>
+        </ul>
+    </nav>
+    <h1>Return a Movie</h1>
+    <form id="return-movie-form">
+        <label for="rental_id">Rental ID:</label>
+        <input type="number" id="rental_id" required />
+        <button type="submit">Return Movie</button>
+    </form>
+
+    <script>
+        document.getElementById("return-movie-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            
+            const rentalId = document.getElementById("rental_id").value;
+            const token = document.cookie.split('=')[1];  
+            
+            const response = await fetch(`http://localhost:4000/api/rentals/${rentalId}/return`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+            
+            const data = await response.json();
+            if (response.ok) {
+                alert("Movie returned successfully");
+            } else {
+                alert(data.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

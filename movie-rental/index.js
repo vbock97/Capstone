@@ -23,6 +23,14 @@ app.use("/api/movies", movieRoutes);
 app.use("/api/rentals", rentalRoutes);
 app.use("/auth", authRoutes);
 
+app.get("/rent-movie", (req, res) => {
+  res.sendFile(path.join(__dirname, "rent.html"));
+});
+
+app.get("/return-movie", (req, res) => {
+  res.sendFile(path.join(__dirname, "return.html"));
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

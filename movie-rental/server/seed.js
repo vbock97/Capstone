@@ -17,6 +17,24 @@ const createUsersTable = async () => {
   }
 };
 
+const createRentalsTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS rentals (
+      id SERIAL PRIMARY KEY,
+      movie_id INTEGER REFERENCES movies(id) ON DELETE CASCADE,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      rented_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      return_by TIMESTAMP,
+      returned_at TIMESTAMP
+    );
+  `;
+  try {
+    await db.query(createTableQuery);
+    console.log("Users table created (or already exists)");
+  } catch (err) {
+    console.error("Error creating users table:", err);
+  }
+};
 const seedMovies = async () => {
   const movies = [
     {
@@ -80,6 +98,7 @@ const seedMovies = async () => {
 
 const seedDatabase = async () => {
   await createUsersTable();
+  await createRentalsTable();
   await seedMovies();
 };
 

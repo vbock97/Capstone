@@ -1,14 +1,12 @@
 const express = require("express");
 const db = require("../db");
-const authenticate =  require('../middleware/auth');
+const authenticate = require("../middleware/auth");
 
 const router = express.Router();
 
-router.post("/rentals", async (req, res) => {
+router.post("/rentals", authenticate, async (req, res) => {
   const { movie_id, return_by } = req.body;
   const userId = req.userId;
-  const rental = req.body;
-  res.status(201).json({ message: "Rental created successfully", rental });
 
   try {
     const movieResult = await db.query(
@@ -36,7 +34,7 @@ router.post("/rentals", async (req, res) => {
   }
 });
 
-router.put("/:rental_id", async (req, res) => {
+router.put("/:rental_id", authenticate, async (req, res) => {
   const { rental_id } = req.params;
 
   try {
@@ -47,8 +45,12 @@ router.put("/:rental_id", async (req, res) => {
     if (rentalResult.rows.length === 0) {
       return res.status(404).json({ message: "Rental not found" });
     }
-
-    const movie_id = rentalResult.rows[0].movie_id;
+    const rental = rentalResult.rows[0];
+    const movie_id = rental.movie_id;
+    const updateRentalQuery = `
+        UPDATE rentals SET returned_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *;
+    `;
+    await db.query(updateRentalQuery, [rental_id]);
     await db.query("UPDATE movies SET available = TRUE WHERE id = $1", [
       movie_id,
     ]);
